@@ -34,17 +34,25 @@ const Notes = () => {
   };
 
   const handleEditSave = async () => {
-    await axios.put(`http://localhost:5000/notes/${editingNote.id}`, {
-      title: editTitle,
-      content: editContent,
-    });
-    setEditingNote(null);
-    fetchNotes();
+    try {
+      await axios.put(`http://localhost:5000/notes/${editingNote.id}`, {
+        title: editTitle,
+        content: editContent,
+      });
+      setEditingNote(null);
+      fetchNotes();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:5000/notes/${id}`);
-    fetchNotes();
+    try {
+      await axios.delete(`http://localhost:5000/notes/${id}`);
+      fetchNotes();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const openModal = () => {
