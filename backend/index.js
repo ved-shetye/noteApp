@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -7,11 +8,11 @@ const app = express();
 const port = 5000;
 
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'postgres',
-  password: 'veds2003',
-  port: 5432,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
 app.use(cors());
@@ -23,6 +24,7 @@ app.get('/notes', async (req, res) => {
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
+    res.status(500).send('Server error');
   }
 });
 
@@ -36,22 +38,10 @@ app.post('/notes', async (req, res) => {
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
-  }
-});
-
-// Endpoint to delete a note
-app.delete('/notes/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    await pool.query('DELETE FROM notes WHERE id = $1', [id]);
-    res.status(204).send();
-  } catch (err) {
-    console.error(err.message);
     res.status(500).send('Server error');
   }
 });
 
-// Endpoint to update a note
 app.put('/notes/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -61,6 +51,17 @@ app.put('/notes/:id', async (req, res) => {
       [title, content, id]
     );
     res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+app.delete('/notes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM notes WHERE id = $1', [id]);
+    res.status(204).send();
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
